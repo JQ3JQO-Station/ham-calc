@@ -17,7 +17,8 @@
 }
 
 /* ===== Light Theme ===== */
-[data-theme="light"] {
+html.light-theme,
+html.light-theme body {
   --bg:        #f6f8fa;
   --bg2:       #ffffff;
   --bg3:       #eaeef2;

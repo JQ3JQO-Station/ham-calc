@@ -473,23 +473,22 @@
 <script>
 // Theme toggle
 (function() {
-  const btn = document.getElementById('theme-toggle');
-  const saved = localStorage.getItem('theme') || 'dark';
-  if (saved === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    btn.textContent = '☀️';
-  }
-  btn.addEventListener('click', () => {
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    if (isLight) {
-      document.documentElement.removeAttribute('data-theme');
-      btn.textContent = '🌙';
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
+  var btn = document.getElementById('theme-toggle');
+  var html = document.documentElement;
+  function setTheme(light) {
+    if (light) {
+      html.classList.add('light-theme');
       btn.textContent = '☀️';
       localStorage.setItem('theme', 'light');
+    } else {
+      html.classList.remove('light-theme');
+      btn.textContent = '🌙';
+      localStorage.setItem('theme', 'dark');
     }
+  }
+  setTheme(localStorage.getItem('theme') === 'light');
+  btn.addEventListener('click', function() {
+    setTheme(!html.classList.contains('light-theme'));
   });
 })();
 
