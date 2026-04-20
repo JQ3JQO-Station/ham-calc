@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JQ3JQO Ham Radio Calculator</title>
+  <meta name="description" content="アマチュア無線 計算ツール集 - 周波数/波長, コイル, LC共振, ランダムワイヤー, UnUn/BalUn">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <span class="callsign">JQ3JQO</span>
+  <span class="title">Ham Radio Calculator</span>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="tab-freqwave">① 周波数↔波長</button>
+  <button class="tab-btn" data-tab="tab-coil">② コイル L/N</button>
+  <button class="tab-btn" data-tab="tab-varicap">③ バリコン→コイル</button>
+  <button class="tab-btn" data-tab="tab-loading">④ センターローディング</button>
+  <button class="tab-btn" data-tab="tab-lc">⑤ LC共振</button>
+  <button class="tab-btn" data-tab="tab-rw">⑥ ランダムワイヤー</button>
+  <button class="tab-btn" data-tab="tab-unun">⑦ UnUn/BalUn</button>
+</nav>
+
+<main>
+
+<!-- ① 周波数↔波長 -->
+<section id="tab-freqwave" class="tab-panel active">
+  <div class="card">
+    <h2>① 周波数 → 波長</h2>
+    <div class="form-row">
+      <label>伝搬速度</label>
+      <select id="fw-speed">
+        <option value="em_approx">電磁波概略 (3×10⁸ m/s)</option>
+        <option value="vacuum">真空中 (299,792,458 m/s)</option>
+        <option value="sound_air">音波 空気中 (340 m/s)</option>
+        <option value="sound_sea">音波 海水中 (1531 m/s)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>周波数</label>
+      <input type="number" id="fw-freq-val" value="7.1" min="0" step="any">
+      <select id="fw-freq-unit">
+        <option value="Hz">Hz</option>
+        <option value="kHz">kHz</option>
+        <option value="MHz" selected>MHz</option>
+        <option value="GHz">GHz</option>
+      </select>
+    </div>
+    <div class="result-box">
+      <h3>計算結果</h3>
+      <table class="result-table"><tbody id="fw-result-from-freq"></tbody></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>① 波長 → 周波数</h2>
+    <div class="form-row">
+      <label>波長</label>
+      <input type="number" id="fw-wave-val" min="0" step="any" placeholder="例: 21.1">
+      <select id="fw-wave-unit">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m" selected>m</option>
+        <option value="km">km</option>
+      </select>
+    </div>
+    <div class="result-box">
+      <h3>計算結果</h3>
+      <table class="result-table"><tbody id="fw-result-from-wave"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<!-- ② コイル L/N -->
+<section id="tab-coil" class="tab-panel">
+  <div class="card">
+    <h2>② ソレノイドコイル 巻数 ↔ インダクタンス</h2>
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem">長岡係数は楕円積分による厳密計算</p>
+
+    <div class="form-row">
+      <label>計算モード</label>
+      <select id="coil-mode">
+        <option value="turns2L">巻数 → L (μH)</option>
+        <option value="L2turns">L (μH) → 巻数</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>比透磁率 μr</label>
+      <input type="number" id="coil-mu" value="1" min="1" step="any">
+      <span class="unit">(空芯=1)</span>
+    </div>
+    <div class="form-row">
+      <label>コイル直径</label>
+      <input type="number" id="coil-diam" min="0.1" step="any" placeholder="例: 30">
+      <span class="unit">mm</span>
+    </div>
+    <div class="form-row">
+      <label>長さ指定方法</label>
+      <select id="coil-len-mode">
+        <option value="length">コイル長(mm)を指定</option>
+        <option value="wire">線材径から自動算出</option>
+      </select>
+    </div>
+    <div class="form-row" id="coil-len-row">
+      <label>コイル長 b</label>
+      <input type="number" id="coil-len" min="0.1" step="any" placeholder="例: 25">
+      <span class="unit">mm</span>
+    </div>
+    <div class="form-row">
+      <label>線材径 φ</label>
+      <input type="number" id="coil-wire-d" min="0.01" step="any" placeholder="例: 0.5">
+      <span class="unit">mm (重量計算用)</span>
+    </div>
+    <div class="form-row" id="coil-group-turns">
+      <label>巻数 N</label>
+      <input type="number" id="coil-turns" min="1" step="1" placeholder="例: 20">
+      <span class="unit">回</span>
+    </div>
+    <div class="form-row" id="coil-group-L" style="display:none">
+      <label>インダクタンス L</label>
+      <input type="number" id="coil-L" min="0" step="any" placeholder="例: 10">
+      <span class="unit">μH</span>
+    </div>
+    <div class="result-box">
+      <h3>計算結果</h3>
+      <div id="coil-result"><p style="color:var(--text2)">パラメータを入力してください</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ③ バリコン→コイル -->
+<section id="tab-varicap" class="tab-panel">
+  <div class="card">
+    <h2>③ バリコン容量 + 周波数 → コイル巻数</h2>
+    <div class="form-row">
+      <label>バリコン最大容量</label>
+      <input type="number" id="vc-cap" min="1" step="any" placeholder="例: 365">
+      <span class="unit">pF</span>
+    </div>
+    <div class="form-row">
+      <label>下限周波数</label>
+      <input type="number" id="vc-freq" min="1" step="any" placeholder="例: 530">
+      <span class="unit">kHz</span>
+    </div>
+    <div class="form-row">
+      <label>比透磁率 μr</label>
+      <input type="number" id="vc-mu" value="1" min="1" step="any">
+    </div>
+    <div class="form-row">
+      <label>コイル直径</label>
+      <input type="number" id="vc-diam" min="0.1" step="any" placeholder="例: 60">
+      <span class="unit">mm</span>
+    </div>
+    <div class="form-row">
+      <label>長さ指定方法</label>
+      <select id="vc-len-mode">
+        <option value="length">コイル長(mm)を指定</option>
+        <option value="wire">線材径から反復計算</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>コイル長 b</label>
+      <input type="number" id="vc-len" min="0.1" step="any" placeholder="例: 50">
+      <span class="unit">mm</span>
+    </div>
+    <div class="form-row">
+      <label>線材径 φ</label>
+      <input type="number" id="vc-wire-d" min="0.01" step="any" placeholder="例: 1.0">
+      <span class="unit">mm</span>
+    </div>
+    <div class="result-box">
+      <h3>計算結果</h3>
+      <div id="vc-result"><p style="color:var(--text2)">パラメータを入力してください</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ センターローディング -->
+<section id="tab-loading" class="tab-panel">
+  <div class="card">
+    <h2>④ センターローディングコイル L 計算</h2>
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem">参考: アンテナハンドブック (CQ出版) の近似式</p>
+    <div class="form-row">
+      <label>中心周波数</label>
+      <input type="number" id="cl-freq" min="0.1" step="any" placeholder="例: 14.2">
+      <span class="unit">MHz</span>
+    </div>
+    <div class="form-row">
+      <label>上部エレメント長 h2</label>
+      <input type="number" id="cl-h2" min="0.01" step="any" placeholder="例: 3.5">
+      <span class="unit">m</span>
+    </div>
+    <div class="form-row">
+      <label>下部エレメント長 h1</label>
+      <input type="number" id="cl-h1" min="0.01" step="any" placeholder="例: 2.0">
+      <span class="unit">m</span>
+    </div>
+    <div class="form-row">
+      <label>エレメント直径 d</label>
+      <input type="number" id="cl-diam" min="0.1" step="any" placeholder="例: 25">
+      <span class="unit">mm</span>
+    </div>
+    <div class="result-box">
+      <h3>計算結果</h3>
+      <div id="cl-result"><p style="color:var(--text2)">パラメータを入力してください</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ LC共振 -->
+<section id="tab-lc" class="tab-panel">
+  <div class="card">
+    <h2>⑤ LC 共振周波数計算</h2>
+    <div class="form-row">
+      <label>計算モード</label>
+      <select id="lc-mode">
+        <option value="lc">L + C → f</option>
+        <option value="fc">f + C → L</option>
+        <option value="fl">f + L → C</option>
+      </select>
+    </div>
+
+    <div id="lc-group-lc">
+      <div class="form-row">
+        <label>インダクタンス L</label>
+        <input type="number" id="lc-L" min="0" step="any" placeholder="例: 10">
+        <span class="unit">μH</span>
+      </div>
+      <div class="form-row">
+        <label>静電容量 C</label>
+        <input type="number" id="lc-C" min="0" step="any" placeholder="例: 100">
+        <span class="unit">pF</span>
+      </div>
+    </div>
+
+    <div id="lc-group-fc" style="display:none">
+      <div class="form-row">
+        <label>共振周波数 f</label>
+        <input type="number" id="lc-f-fc" min="0" step="any" placeholder="例: 7.1">
+        <span class="unit">MHz</span>
+      </div>
+      <div class="form-row">
+        <label>静電容量 C</label>
+        <input type="number" id="lc-C2" min="0" step="any" placeholder="例: 100">
+        <span class="unit">pF</span>
+      </div>
+    </div>
+
+    <div id="lc-group-fl" style="display:none">
+      <div class="form-row">
+        <label>共振周波数 f</label>
+        <input type="number" id="lc-f-fl" min="0" step="any" placeholder="例: 7.1">
+        <span class="unit">MHz</span>
+      </div>
+      <div class="form-row">
+        <label>インダクタンス L</label>
+        <input type="number" id="lc-L2" min="0" step="any" placeholder="例: 10">
+        <span class="unit">μH</span>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <h3>計算結果</h3>
+      <div id="lc-result"><p style="color:var(--text2)">パラメータを入力してください</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ ランダムワイヤー -->
+<section id="tab-rw" class="tab-panel">
+  <div class="card">
+    <h2>⑥ ランダムワイヤー長 計算</h2>
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem">
+      短縮率 0.95 を適用。半波長の整数倍 ±5% を「共振に近い長さ」として警告します。
+    </p>
+    <div class="form-row">
+      <label>検討するワイヤー長</label>
+      <input type="number" id="rw-len" min="1" step="0.5" placeholder="例: 20.5">
+      <span class="unit">m (任意)</span>
+    </div>
+    <div id="rw-warn" style="margin:0.75rem 0"></div>
+
+    <div class="rw-tables">
+      <div>
+        <h3>各バンドのλ/2</h3>
+        <table>
+          <thead><tr><th>バンド</th><th>λ/2 (短縮率0.95)</th></tr></thead>
+          <tbody id="rw-table-body"></tbody>
+        </table>
+      </div>
+      <div>
+        <h3>推奨候補長 (5〜41m)</h3>
+        <table>
+          <thead><tr><th>代表値</th><th>範囲</th></tr></thead>
+          <tbody id="rw-avoid-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑦ UnUn/BalUn -->
+<section id="tab-unun" class="tab-panel">
+  <div class="card">
+    <h2>⑦ 9:1 UnUn / BalUn コア巻数計算</h2>
+    <div class="form-row">
+      <label>コア種類</label>
+      <select id="un-core">
+        <option value="FT140-43">FT140-43 (Mix43)</option>
+        <option value="FT240-43">FT240-43 (Mix43)</option>
+        <option value="FT140-61">FT140-61 (Mix61)</option>
+        <option value="FT240-61">FT240-61 (Mix61)</option>
+        <option value="custom">カスタム</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Al値</label>
+      <input type="number" id="un-al" min="1" step="any" placeholder="nH/N²">
+      <span class="unit">nH/N²</span>
+    </div>
+    <div class="form-row">
+      <label>下限周波数</label>
+      <input type="number" id="un-freq-low" value="3.5" min="0.1" step="any">
+      <span class="unit">MHz</span>
+    </div>
+    <div class="form-row">
+      <label>上限周波数 (任意)</label>
+      <input type="number" id="un-freq-high" min="0.1" step="any" placeholder="例: 30">
+      <span class="unit">MHz</span>
+    </div>
+    <div class="form-row">
+      <label>変換比</label>
+      <select id="un-ratio">
+        <option value="9:1">9:1 (UnUn)</option>
+        <option value="4:1">4:1 (BalUn/UnUn)</option>
+        <option value="1:1">1:1 (BalUn)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>基準インピーダンス Z</label>
+      <input type="number" id="un-z" value="50" min="1" step="any">
+      <span class="unit">Ω</span>
+    </div>
+    <div class="result-box">
+      <h3>計算結果</h3>
+      <div id="un-result"><p style="color:var(--text2)">パラメータを入力してください</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>JQ3JQO Ham Radio Calculator &mdash; Static web tools for amateur radio</p>
+  <p style="margin-top:0.25rem"><a href="https://github.com/JQ3JQO-Station/ham-calc" style="color:var(--accent)">GitHub</a></p>
+</footer>
+
+<script src="js/calc_freq_wave.js"></script>
+<script src="js/calc_coil.js"></script>
+<script src="js/calc_loading.js"></script>
+<script src="js/calc_lc.js"></script>
+<script src="js/calc_random_wire.js"></script>
+<script src="js/calc_unun.js"></script>
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Initialize all calculators
+initFreqWave();
+initCoil();
+initVaricap();
+initCenterLoading();
+initLC();
+initRandomWire();
+initUnun();
+</script>
+</body>
+</html>
