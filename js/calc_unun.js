@@ -1,6 +1,7 @@
 // 9:1 UnUn / 4:1 BalUn / 1:1 BalUn コア巻数計算
 
 const CORE_PRESETS = {
+  'FT114-43': { Al: 603,  name: 'FT114-43 (Mix 43)' },
   'FT140-43': { Al: 885,  name: 'FT140-43 (Mix 43)' },
   'FT240-43': { Al: 1075, name: 'FT240-43 (Mix 43)' },
   'FT140-61': { Al: 195,  name: 'FT140-61 (Mix 61)' },
@@ -73,16 +74,19 @@ function calcUnun() {
   // 線材長目安（巻数×コア平均周長）
   const core = document.getElementById('un-core').value;
   let wireNote = '';
-  const coreSizes = {
-    'FT140-43': 35.5, 'FT240-43': 53.4,
-    'FT140-61': 35.5, 'FT240-61': 53.4,
+  // 平均円周長 (mm): π × (OD+ID)/2  各コア実測値
+  const coreCircMm = {
+    'FT114-43': 75.4,  // OD29 ID19
+    'FT140-43': 91.9,  // OD35.5 ID23
+    'FT240-43': 151.8, // OD61 ID35.6
+    'FT140-61': 91.9,
+    'FT240-61': 151.8,
   };
-  if (coreSizes[core]) {
-    const cCirc = coreSizes[core] / 10; // cm → (そのまま cm)
-    // 変成器は1次+2次なので巻数×2、UnUnは3線式
+  if (coreCircMm[core]) {
+    const turnLen = coreCircMm[core] / 1000; // m/ターン
     const ratioLines = { '9:1': 3, '4:1': 2, '1:1': 2 };
     const lines = ratioLines[ratio] || 2;
-    const wireLen = N_ceil * lines * (cCirc / 100) * 1.1; // 余裕10%
+    const wireLen = N_ceil * lines * turnLen * 1.1; // 余裕10%
     wireNote = `<tr><td>線材長目安</td><td>≈ ${fmtN(wireLen)} m (×${lines}線)</td></tr>`;
   }
 

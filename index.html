@@ -30,6 +30,7 @@
 <section id="tab-freqwave" class="tab-panel active">
   <div class="card">
     <h2>① 周波数 → 波長</h2>
+    <div class="desc-text">λ = v / f の関係式で周波数と波長を変換します。伝搬速度は電磁波（無線）と音波から選択可能。λ/2 はダイポール、λ/4 は垂直アンテナの基準長さです。</div>
     <div class="form-row">
       <label>伝搬速度</label>
       <select id="fw-speed">
@@ -78,7 +79,39 @@
 <section id="tab-coil" class="tab-panel">
   <div class="card">
     <h2>② ソレノイドコイル 巻数 ↔ インダクタンス</h2>
-    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem">長岡係数は楕円積分による厳密計算</p>
+    <div class="desc-text">円筒形（ソレノイド）コイルの巻数 N とインダクタンス L を相互変換します。長岡係数 K を第一種・第二種完全楕円積分で厳密計算するため、空芯・フェライトコアどちらにも対応。下図の各寸法を参照して入力してください。</div>
+    <svg viewBox="0 0 400 165" class="diagram-svg" aria-label="ソレノイドコイル寸法図">
+      <defs>
+        <marker id="s2-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,1.5 L7,4 L0,6.5" fill="none" stroke="#6e7681" stroke-width="1.2"/>
+        </marker>
+        <marker id="s2-b" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto">
+          <path d="M8,1.5 L1,4 L8,6.5" fill="none" stroke="#6e7681" stroke-width="1.2"/>
+        </marker>
+      </defs>
+      <!-- Upper coil arcs (6 turns) -->
+      <path d="M95,90 Q111,55 127,90 Q143,55 159,90 Q175,55 191,90 Q207,55 223,90 Q239,55 255,90 Q271,55 285,90"
+            stroke="#58a6ff" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Lower coil arcs -->
+      <path d="M95,90 Q111,125 127,90 Q143,125 159,90 Q175,125 191,90 Q207,125 223,90 Q239,125 255,90 Q271,125 285,90"
+            stroke="#58a6ff" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Lead wires -->
+      <line x1="30" y1="90" x2="95" y2="90" stroke="#8b949e" stroke-width="2"/>
+      <line x1="285" y1="90" x2="355" y2="90" stroke="#8b949e" stroke-width="2"/>
+      <!-- Dimension b (length) -->
+      <line x1="95" y1="143" x2="285" y2="143" stroke="#6e7681" stroke-width="1.5"
+            marker-start="url(#s2-b)" marker-end="url(#s2-a)"/>
+      <text x="190" y="159" text-anchor="middle" fill="#8b949e" font-size="12" font-family="sans-serif">b（コイル長）</text>
+      <!-- Dimension 直径 -->
+      <line x1="63" y1="55" x2="63" y2="125" stroke="#6e7681" stroke-width="1.5"
+            marker-start="url(#s2-b)" marker-end="url(#s2-a)"/>
+      <text x="57" y="94" text-anchor="end" fill="#8b949e" font-size="12" font-family="sans-serif">直径</text>
+      <!-- φ wire cross-section indicator -->
+      <circle cx="320" cy="36" r="8" fill="none" stroke="#3fb950" stroke-width="2"/>
+      <circle cx="320" cy="36" r="2.5" fill="#3fb950"/>
+      <text x="332" y="40" fill="#3fb950" font-size="13" font-family="sans-serif" font-style="italic">φ</text>
+      <line x1="320" y1="44" x2="268" y2="68" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2" opacity="0.6"/>
+    </svg>
 
     <div class="form-row">
       <label>計算モード</label>
@@ -135,6 +168,36 @@
 <section id="tab-varicap" class="tab-panel">
   <div class="card">
     <h2>③ バリコン容量 + 周波数 → コイル巻数</h2>
+    <div class="desc-text">バリコン（可変コンデンサ）の最大容量 Cmax 時に下限周波数 fmin で LC 共振するコイルの巻数を求めます。ゲルマラジオやスーパーへテロダイン受信機のバンドコイル設計などに使います。</div>
+    <svg viewBox="0 0 300 165" class="diagram-svg" aria-label="LC同調回路図">
+      <defs>
+        <marker id="s3-a" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0,0.5 L6.5,3.5 L0,6.5 Z" fill="#58a6ff"/>
+        </marker>
+      </defs>
+      <!-- Top rail -->
+      <line x1="20" y1="30" x2="280" y2="30" stroke="#8b949e" stroke-width="2"/>
+      <!-- Bottom rail -->
+      <line x1="20" y1="135" x2="280" y2="135" stroke="#8b949e" stroke-width="2"/>
+      <!-- Left terminals -->
+      <circle cx="20" cy="30" r="3.5" fill="#8b949e"/>
+      <circle cx="20" cy="135" r="3.5" fill="#8b949e"/>
+      <!-- Variable Capacitor branch (x=100) -->
+      <line x1="100" y1="30" x2="100" y2="63" stroke="#58a6ff" stroke-width="2"/>
+      <line x1="74" y1="63" x2="126" y2="63" stroke="#58a6ff" stroke-width="3"/>
+      <path d="M74,77 Q100,72 126,77" stroke="#58a6ff" fill="none" stroke-width="3"/>
+      <line x1="82" y1="88" x2="118" y2="52" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#s3-a)"/>
+      <line x1="100" y1="77" x2="100" y2="135" stroke="#58a6ff" stroke-width="2"/>
+      <text x="100" y="151" text-anchor="middle" fill="#58a6ff" font-size="12">Cmax</text>
+      <!-- Inductor branch (x=200) -->
+      <line x1="200" y1="30" x2="200" y2="50" stroke="#3fb950" stroke-width="2"/>
+      <path d="M200,115 Q214,107 200,99 Q186,91 200,83 Q214,75 200,67 Q186,59 200,50"
+            fill="none" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="200" y1="115" x2="200" y2="135" stroke="#3fb950" stroke-width="2"/>
+      <text x="218" y="86" fill="#3fb950" font-size="14" font-style="italic">L</text>
+      <!-- Formula -->
+      <text x="150" y="160" text-anchor="middle" fill="#6e7681" font-size="10" font-family="monospace">f = 1 / (2π√L·Cmax)</text>
+    </svg>
     <div class="form-row">
       <label>バリコン最大容量</label>
       <input type="number" id="vc-cap" min="1" step="any" placeholder="例: 365">
@@ -182,7 +245,46 @@
 <section id="tab-loading" class="tab-panel">
   <div class="card">
     <h2>④ センターローディングコイル L 計算</h2>
-    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem">参考: アンテナハンドブック (CQ出版) の近似式</p>
+    <div class="desc-text">モービルアンテナ等でエレメントを短縮する際に途中に挿入するローディングコイルの必要インダクタンス L を計算します（アンテナハンドブック CQ出版 準拠の近似式）。h1 が下部、h2 が上部エレメント長です。</div>
+    <svg viewBox="0 0 240 295" class="diagram-svg narrow" aria-label="センターローディングアンテナ図">
+      <defs>
+        <marker id="s4-a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,1.5 L7,4 L0,6.5" fill="none" stroke="#6e7681" stroke-width="1.2"/>
+        </marker>
+        <marker id="s4-b" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto">
+          <path d="M8,1.5 L1,4 L8,6.5" fill="none" stroke="#6e7681" stroke-width="1.2"/>
+        </marker>
+      </defs>
+      <!-- Ground plane -->
+      <line x1="68" y1="252" x2="172" y2="252" stroke="#8b949e" stroke-width="3"/>
+      <line x1="80" y1="260" x2="160" y2="260" stroke="#8b949e" stroke-width="2"/>
+      <line x1="93" y1="268" x2="147" y2="268" stroke="#8b949e" stroke-width="1.5"/>
+      <line x1="106" y1="276" x2="134" y2="276" stroke="#8b949e" stroke-width="1"/>
+      <!-- Lower element (h1) -->
+      <line x1="120" y1="162" x2="120" y2="252" stroke="#58a6ff" stroke-width="4"/>
+      <!-- Loading coil box -->
+      <rect x="97" y="141" width="46" height="21" rx="3" fill="#161b22" stroke="#f0883e" stroke-width="2.5"/>
+      <path d="M99,151.5 Q104,145 109,151.5 Q114,145 119,151.5 Q124,145 129,151.5 Q134,145 139,151.5 Q144,145 141,151.5"
+            fill="none" stroke="#f0883e" stroke-width="1.5"/>
+      <!-- Upper element (h2) -->
+      <line x1="120" y1="30" x2="120" y2="141" stroke="#58a6ff" stroke-width="4"/>
+      <!-- Tip -->
+      <line x1="115" y1="30" x2="125" y2="30" stroke="#58a6ff" stroke-width="2.5"/>
+      <!-- h1 dimension arrow -->
+      <line x1="80" y1="162" x2="80" y2="252" stroke="#6e7681" stroke-width="1.5"
+            marker-start="url(#s4-b)" marker-end="url(#s4-a)"/>
+      <text x="74" y="211" text-anchor="end" fill="#8b949e" font-size="14" font-style="italic">h1</text>
+      <!-- h2 dimension arrow -->
+      <line x1="57" y1="30" x2="57" y2="141" stroke="#6e7681" stroke-width="1.5"
+            marker-start="url(#s4-b)" marker-end="url(#s4-a)"/>
+      <text x="51" y="89" text-anchor="end" fill="#8b949e" font-size="14" font-style="italic">h2</text>
+      <!-- L label -->
+      <text x="149" y="156" fill="#f0883e" font-size="16" font-style="italic">L</text>
+      <!-- d (element diameter) indicator -->
+      <line x1="109" y1="242" x2="131" y2="242" stroke="#3fb950" stroke-width="1.5"
+            marker-start="url(#s4-b)" marker-end="url(#s4-a)"/>
+      <text x="120" y="237" text-anchor="middle" fill="#3fb950" font-size="12" font-style="italic">d</text>
+    </svg>
     <div class="form-row">
       <label>中心周波数</label>
       <input type="number" id="cl-freq" min="0.1" step="any" placeholder="例: 14.2">
@@ -214,6 +316,7 @@
 <section id="tab-lc" class="tab-panel">
   <div class="card">
     <h2>⑤ LC 共振周波数計算</h2>
+    <div class="desc-text">f = 1/(2π√LC) の式を 3 通りのモードで計算します。コイルとコンデンサを組み合わせた共振回路の設計、バンドフィルタや送信機のタンク回路の確認に使います。</div>
     <div class="form-row">
       <label>計算モード</label>
       <select id="lc-mode">
@@ -306,14 +409,16 @@
 <section id="tab-unun" class="tab-panel">
   <div class="card">
     <h2>⑦ 9:1 UnUn / BalUn コア巻数計算</h2>
+    <div class="desc-text">トロイダルコアに巻く変成器（UnUn・BalUn）の推奨巻数を計算します。基準は XL ≥ 4×Z（最低動作条件）。N = √(L/Al) で最低巻数を求め、切り上げた整数値を推奨します。巻数を増やすほど低域特性が改善しますが分布容量も増えます。Al値は各コアのメーカーデータシートを参照してください。</div>
     <div class="form-row">
       <label>コア種類</label>
       <select id="un-core">
+        <option value="FT114-43">FT114-43 (Mix43) — 小型</option>
         <option value="FT140-43">FT140-43 (Mix43)</option>
-        <option value="FT240-43">FT240-43 (Mix43)</option>
+        <option value="FT240-43">FT240-43 (Mix43) — 大型</option>
         <option value="FT140-61">FT140-61 (Mix61)</option>
         <option value="FT240-61">FT240-61 (Mix61)</option>
-        <option value="custom">カスタム</option>
+        <option value="custom">カスタム (Al値を入力)</option>
       </select>
     </div>
     <div class="form-row">

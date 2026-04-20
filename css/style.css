@@ -191,6 +191,29 @@ table.result-table strong { color: var(--accent2); }
   cursor: pointer;
 }
 
+/* ===== Diagram SVG ===== */
+.diagram-svg {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  display: block;
+  margin: 0.75rem auto 1rem;
+  background: var(--bg3);
+  border-radius: 6px;
+  padding: 6px;
+}
+.diagram-svg.narrow { max-width: 220px; }
+.desc-text {
+  color: var(--text2);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg3);
+  border-left: 3px solid var(--border);
+  border-radius: 0 4px 4px 0;
+}
+
 /* ===== Warning / OK boxes ===== */
 .warn-box {
   background: rgba(240,136,62,0.1);
