@@ -9,11 +9,7 @@ const CORE_PRESETS = {
   'custom':   { Al: null, name: 'カスタム' },
 };
 
-const RATIO_ZIN = {
-  '9:1': 450, // 9 × 50Ω
-  '4:1': 200, // 4 × 50Ω
-  '1:1': 50,
-};
+const RATIO_FACTOR = { '9:1': 9, '4:1': 4, '1:1': 1 };
 
 function initUnun() {
   document.getElementById('un-core')?.addEventListener('change', onCoreChange);
@@ -51,9 +47,10 @@ function calcUnun() {
     return;
   }
 
-  // 必要最低インダクタンス: XL ≥ 4×Z（入力インピーダンス）
-  const Zin = RATIO_ZIN[ratio] || Z;
-  const XL_min = 4 * Z; // XL ≥ 4×50Ω が一般的基準
+  // 高インピーダンス側 Zin = 変換比 × Z（XL はこちらの4倍以上が必要）
+  const factor = RATIO_FACTOR[ratio] || 1;
+  const Zin = factor * Z;
+  const XL_min = 4 * Zin; // XL ≥ 4×Zin（高インピーダンス側基準）
   const omega = 2 * Math.PI * fLow;
   const L_min = XL_min / omega; // H
   const L_min_nH = L_min * 1e9;
@@ -92,9 +89,9 @@ function calcUnun() {
 
   result.innerHTML = `
     <table class="result-table">
-      <tr><td>変換比</td><td>${ratio}</td></tr>
-      <tr><td>必要最低インダクタンス</td><td>${fmtN(L_min*1e6)} μH (XL ≥ ${XL_min} Ω)</td></tr>
-      <tr><td>推奨巻数 N</td><td><strong>${N_ceil} 回</strong> (理論値: ${fmtN(N)} 回)</td></tr>
+      <tr><td>変換比</td><td>${ratio} &nbsp;(${Z} Ω ↔ ${fmtN(Zin)} Ω)</td></tr>
+      <tr><td>必要最低インダクタンス</td><td>${fmtN(L_min*1e6)} μH &nbsp;(XL ≥ ${fmtN(XL_min)} Ω)</td></tr>
+      <tr><td>推奨巻数 N</td><td><strong>${N_ceil} 回</strong> &nbsp;(理論値: ${fmtN(N)} 回)</td></tr>
       <tr><td>実際のインダクタンス</td><td>${fmtN(L_actual_nH/1000)} μH</td></tr>
       <tr><td>XL (下限周波数)</td><td>${fmtN(XL_actual_low)} Ω</td></tr>
       ${XL_high_str}
