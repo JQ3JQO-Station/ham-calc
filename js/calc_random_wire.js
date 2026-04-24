@@ -1,4 +1,4 @@
-// ランダムワイヤー長計算（バンドごと）
+// ランダムワイヤー長計算（バンド選択式）
 
 const BANDS = [
   { name: '7 MHz (40m)',   f: 7 },
@@ -16,55 +16,67 @@ const VELOCITY_FACTOR = 0.95;
 const AVOID_MARGIN = 0.05; // ±5%
 
 function initRandomWire() {
-  document.getElementById('rw-len')?.addEventListener('input', calcRandomWire);
+  const container = document.getElementById('rw-band-checks');
+  if (!container) return;
+  BANDS.forEach((band, i) => {
+    const label = document.createElement('label');
+    label.style.cssText = 'display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.875rem;color:var(--text)';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.id = `rw-cb-${i}`;
+    cb.checked = true;
+    cb.addEventListener('change', calcRandomWire);
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(band.name));
+    container.appendChild(label);
+  });
+  calcRandomWire();
+}
+
+function rwSelectAll(val) {
+  BANDS.forEach((_, i) => {
+    const cb = document.getElementById(`rw-cb-${i}`);
+    if (cb) cb.checked = val;
+  });
   calcRandomWire();
 }
 
 function calcRandomWire() {
-  const userLen = parseFloat(document.getElementById('rw-len')?.value);
-  const tbody = document.getElementById('rw-table-body');
+  const tbody  = document.getElementById('rw-table-body');
   const tbody2 = document.getElementById('rw-avoid-body');
 
-  // 全バンドのハーフウェーブ長を計算
-  const rows = BANDS.map(band => {
-    const halfWave = (150 / band.f) * VELOCITY_FACTOR; // m
-    return { band, halfWave };
-  });
+  // 選択バンドを取得
+  const selectedRows = BANDS
+    .map((band, i) => {
+      const cb = document.getElementById(`rw-cb-${i}`);
+      if (!cb?.checked) return null;
+      const halfWave = (150 / band.f) * VELOCITY_FACTOR;
+      return { band, halfWave };
+    })
+    .filter(r => r !== null);
 
-  tbody.innerHTML = rows.map(r => `
-    <tr>
-      <td>${r.band.name}</td>
-      <td>${r.halfWave.toFixed(2)} m</td>
-    </tr>
-  `).join('');
+  // λ/2 テーブル
+  tbody.innerHTML = selectedRows.length === 0
+    ? '<tr><td colspan="2" style="color:var(--text2);padding:0.5rem 0.6rem">バンドを選択してください</td></tr>'
+    : selectedRows.map(r => `
+        <tr>
+          <td>${r.band.name}</td>
+          <td>${r.halfWave.toFixed(2)} m</td>
+        </tr>
+      `).join('');
 
-  // ユーザー入力長の評価
-  if (!isNaN(userLen) && userLen > 0) {
-    let badBands = [];
-    rows.forEach(r => {
-      for (let n = 1; n <= 15; n++) {
-        const resLen = r.halfWave * n;
-        if (Math.abs(userLen - resLen) / resLen <= AVOID_MARGIN) {
-          badBands.push(`${r.band.name} の ${n}λ/2 (${resLen.toFixed(2)} m)`);
-        }
-      }
-    });
-    const warn = document.getElementById('rw-warn');
-    if (badBands.length > 0) {
-      warn.innerHTML = `<div class="warn-box">⚠ <strong>${userLen} m</strong> は以下の共振長に近いため注意：<br>` +
-        badBands.map(s => `・${s}`).join('<br>') + '</div>';
-    } else {
-      warn.innerHTML = `<div class="ok-box">✓ <strong>${userLen} m</strong> は全バンドで共振を避けられます</div>`;
-    }
-  } else {
-    document.getElementById('rw-warn').innerHTML = '';
+  if (!tbody2) return;
+
+  if (selectedRows.length === 0) {
+    tbody2.innerHTML = '<tr><td colspan="2" style="color:var(--text2);padding:0.5rem 0.6rem">バンドを選択してください</td></tr>';
+    return;
   }
 
-  // 推奨長候補表（5〜30mの範囲でバンド全て回避できる長さ）
+  // 推奨長候補（選択バンドの共振を全て回避できる長さ）
   const candidates = [];
   for (let len = 5.0; len <= 41.0; len += 0.5) {
     let ok = true;
-    outer: for (const r of rows) {
+    outer: for (const r of selectedRows) {
       for (let n = 1; n <= 15; n++) {
         const resLen = r.halfWave * n;
         if (Math.abs(len - resLen) / resLen <= AVOID_MARGIN) {
@@ -76,20 +88,23 @@ function calcRandomWire() {
     if (ok) candidates.push(len);
   }
 
-  // 推奨候補を5m間隔でグループ化して代表値を表示
-  if (tbody2) {
-    const groups = [];
-    let group = [];
-    for (let i = 0; i < candidates.length; i++) {
-      group.push(candidates[i]);
-      if (i === candidates.length - 1 || candidates[i + 1] - candidates[i] > 1.5) {
-        groups.push(group);
-        group = [];
-      }
-    }
-    tbody2.innerHTML = groups.slice(0, 15).map(g => {
-      const mid = g[Math.floor(g.length / 2)];
-      return `<tr><td>${mid.toFixed(1)} m</td><td>${g[0].toFixed(1)}〜${g[g.length-1].toFixed(1)} m</td></tr>`;
-    }).join('');
+  if (candidates.length === 0) {
+    tbody2.innerHTML = '<tr><td colspan="2" style="color:var(--warn);padding:0.5rem 0.6rem">条件を満たす長さが見つかりません</td></tr>';
+    return;
   }
+
+  // 連続する候補をグループ化して代表値を表示
+  const groups = [];
+  let group = [];
+  for (let i = 0; i < candidates.length; i++) {
+    group.push(candidates[i]);
+    if (i === candidates.length - 1 || candidates[i + 1] - candidates[i] > 1.5) {
+      groups.push(group);
+      group = [];
+    }
+  }
+  tbody2.innerHTML = groups.slice(0, 15).map(g => {
+    const mid = g[Math.floor(g.length / 2)];
+    return `<tr><td>${mid.toFixed(1)} m</td><td>${g[0].toFixed(1)}〜${g[g.length-1].toFixed(1)} m</td></tr>`;
+  }).join('');
 }
